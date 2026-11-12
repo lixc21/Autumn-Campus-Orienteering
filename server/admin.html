@@ -1,0 +1,512 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
+<title>后台 · __TITLE__</title>
+<style>.viz-root{color-scheme:light;--surface:#fcfcfb;--page:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+  --grid:#e1e0d9;--axis:#c3c2b7;--ring:rgba(11,11,11,.10);--s1:#2a78d6;--good:#0ca30c;--warn:#fab219;--crit:#d03b3b}
+@media (prefers-color-scheme:dark){.viz-root{color-scheme:dark;--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;
+  --grid:#2c2c2a;--axis:#383835;--ring:rgba(255,255,255,.10);--s1:#3987e5}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1200px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+h1{font-size:20px;font-weight:600;margin:0}
+.status{flex:1;min-width:240px;color:var(--ink2);font-size:13px;display:flex;align-items:baseline;gap:6px}
+.dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--good)} .dot.err{background:var(--crit)}
+.muted{color:var(--muted)}
+button,select,input[type=search],input[type=text],input[type=password]{font:inherit;font-size:13px;padding:4px 10px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink)}
+button{cursor:pointer} button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--s1);border-color:var(--s1);color:#fff}
+button.danger{color:var(--crit);border-color:var(--crit)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.tile,.card,.login{background:var(--surface);border:1px solid var(--ring);border-radius:10px}
+.tile{padding:12px 16px}
+.tile .lb{color:var(--ink2);font-size:13px}
+.tile .v{font-size:32px;font-weight:600;line-height:1.25}
+.tile .v small{font-size:14px;font-weight:400;color:var(--ink2);margin-left:4px}
+.card{padding:14px 16px;margin:12px 0}
+.card h2{font-size:15px;font-weight:600;margin:0 0 10px}
+.sub{color:var(--muted);font-size:12px;font-weight:400;margin-left:10px}
+.row{display:grid;grid-template-columns:110px 1fr 64px;align-items:center;gap:10px;min-height:28px}
+.row .lb{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{height:14px;background:var(--grid);border-radius:0 4px 4px 0}
+.fill{height:100%;max-width:100%;background:var(--s1);border-radius:0 4px 4px 0}
+.val{font-size:13px;font-variant-numeric:tabular-nums}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 24px}
+.zone h3{font-size:13px;font-weight:600;color:var(--ink2);margin:0 0 2px}
+.zone .row{grid-template-columns:28px 1fr 24px;min-height:24px}
+.zone .track{height:10px}
+.tools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:8px;font-size:13px}
+.tools input[type=search]{min-width:220px}
+.tools .sp{flex:1}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-weight:600;color:var(--ink2);text-align:left;border-bottom:1px solid var(--axis);padding:6px 8px;white-space:nowrap}
+td{border-bottom:1px solid var(--grid);padding:6px 8px;vertical-align:middle;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.wide{white-space:normal;min-width:16em}
+.code{font-family:Consolas,"SF Mono",monospace;font-weight:600;letter-spacing:.05em}
+.mem{display:block;color:var(--muted);font-size:12px;white-space:normal;max-width:16em}
+tr.test td{opacity:.55}
+.grid{display:flex;gap:6px}
+.grid span{display:flex;gap:2px}
+.grid i{display:block;width:10px;height:16px;border-radius:2px;background:var(--grid)}
+.grid i.y{background:var(--s1)}
+.ic.good{color:var(--good)} .ic.warn{color:var(--warn)}
+.empty{color:var(--muted);padding:6px 0}
+.msg{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:14px 16px;margin:14px 0}
+.note{color:var(--muted);font-size:12px;margin-top:16px}
+.login{max-width:380px;margin:12vh auto 0;padding:20px 22px}
+.login label{display:block;color:var(--ink2);font-size:13px}
+.login input[type=password]{width:100%;font-size:16px;padding:8px 10px;margin:4px 0 12px}
+.login .bar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.login .note{margin:12px 0 0}
+.err{min-height:1.5em;margin:10px 0 0;font-size:13px}
+.err:not(:empty)::before{content:"⚠ ";color:var(--crit)} .err.wait::before{content:none}
+dialog{border:1px solid var(--ring);border-radius:12px;background:var(--surface);color:var(--ink);padding:18px 20px;width:min(600px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+dialog h2{font-size:16px;font-weight:600;margin:0 0 12px}
+.f{display:grid;grid-template-columns:4em 1fr;gap:8px 10px;align-items:center;font-size:13px}
+.f input[type=text]{width:100%}
+.info{font-size:13px;color:var(--ink2);margin:10px 0}
+fieldset{border:1px solid var(--grid);border-radius:8px;margin:10px 0 0;padding:8px 12px}
+legend{font-size:13px;color:var(--ink2);padding:0 4px}
+.qs div{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;min-height:28px}
+.qs b{width:6.5em;font-weight:600;color:var(--ink2);font-size:12px}
+.qs label{font-size:13px;white-space:nowrap}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btns .sp{flex:1}
+#tip,#toast{position:fixed;z-index:9;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:4px 8px;border-radius:6px}
+#tip{display:none;white-space:nowrap}
+#toast{left:50%;bottom:24px;transform:translateX(-50%);font-size:13px;padding:8px 14px;opacity:0;transition:opacity .2s}
+#toast.on{opacity:1}
+</style></head><body class="viz-root">
+
+<div id="login" class="login" hidden>
+<h1>__TITLE__ · 后台</h1>
+<form id="lg"><p class="muted" style="margin:6px 0 14px;font-size:13px">工作人员专用：看进度、改进度、增删队伍、看日志</p>
+<label for="pw">后台密码</label><input type="password" id="pw" autocomplete="current-password">
+<div class="bar"><label><input type="checkbox" id="remember" checked> 记住这台设备</label><button class="primary" id="lg-go">进入</button></div>
+<p class="err" id="lg-err"></p></form>
+<p class="note">密码不会发到网上：本机用它算出密钥、给每个请求签名，服务器只核对签名。公用电脑别勾「记住」，用完点「退出」。</p>
+</div>
+
+<main id="app" hidden>
+<header><h1>__TITLE__ · 后台</h1><div id="status" class="status"><i class="dot"></i>连接中…</div>
+<button id="refresh">立即刷新</button><button id="logout">退出</button></header>
+<div id="msg" class="msg" hidden></div>
+<div id="body" hidden>
+<section class="tiles" id="tiles"></section>
+<section class="card"><h2>各区完成的队数<span class="sub">分母是已出发的队（上报过至少 1 题），不含测试账号</span></h2><div id="zbars"></div></section>
+<section class="card"><h2>每题找到的队数</h2><div class="zones" id="qbars"></div></section>
+<section class="card"><h2>各队进度<span class="sub" id="tcount"></span></h2>
+<div class="tools"><input type="search" id="kw" placeholder="搜队名、姓名或核验码">
+<select id="sort"><option value="prog">按进度排</option><option value="name">按队名排</option></select>
+<label><input type="checkbox" id="all"> 显示测试账号和没用过的备用账号</label><span class="sp"></span><button id="add">＋ 新增队伍</button></div>
+<div class="wrap"><table><thead><tr><th>#</th><th>队伍</th><th>核验码</th><th>进度（每格一题，按区分组）</th><th>题数</th><th>通关</th><th>最后联网</th><th>可疑</th><th></th></tr></thead>
+<tbody id="teams"></tbody></table></div></section>
+<section class="card"><h2>日志<span class="sub">新的在上；一次显示 200 条，往下可以加载更早的</span></h2>
+<div class="tools"><select id="lk"><option value="">全部</option><option value="solve">答题与联网</option><option value="warn">可疑与限流</option><option value="admin">后台操作</option></select>
+<input type="search" id="lkw" maxlength="40" placeholder="搜队名、内容或 IP"><span class="sp"></span>
+<span id="lpause" class="muted" hidden>正在看更早的记录，日志暂停自动刷新</span><button id="lnew" hidden>回到最新</button></div>
+<div class="wrap" id="log"></div>
+<div class="tools"><button id="lmore" hidden>加载更早的 200 条</button></div></section>
+</div>
+<p class="note">仅限工作人员，勿外传。进度是同队各台手机上报的合计，断网的手机会滞后；核对以手机终章页为准。</p>
+</main>
+
+<dialog id="dlg"><form id="dlg-form">
+<h2 id="dlg-title">编辑队伍</h2>
+<div class="f"><label for="f-name">队名</label><input type="text" id="f-name" maxlength="40">
+<label for="f-members">成员</label><input type="text" id="f-members" maxlength="200" placeholder="用顿号隔开">
+<span></span><label><input type="checkbox" id="f-test"> 测试账号（不计入全场统计）</label></div>
+<p class="info" id="dlg-info"></p>
+<fieldset><legend>进度：勾上 = 已找到（手动勾的记为现在的时间）</legend><div class="qs" id="dlg-qs"></div>
+<div class="btns" style="margin-top:6px"><button type="button" data-all="1">全勾</button><button type="button" data-all="0">全不勾</button></div></fieldset>
+<p class="err" id="dlg-err"></p>
+<div class="btns"><button type="button" id="dlg-del" class="danger">删除这队</button><button type="button" id="dlg-flags">清除可疑记录</button>
+<span class="sp"></span><button type="button" id="dlg-cancel">取消</button><button class="primary" id="dlg-save">保存</button></div>
+</form></dialog>
+<div id="tip"></div><div id="toast"></div>
+
+<script>(function () {
+  'use strict';
+  const CFG = __CFG__, REFRESH = 20, KEY_NAME = 'orient-admin|' + CFG.salt;
+  const $ = s => document.querySelector(s);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const hms = t => t ? new Date(t * 1000).toLocaleTimeString('zh-CN', { hour12: false }) : '';
+  const hm = t => hms(t).slice(0, 5);
+  const ago = t => { const s = Math.max(0, Math.round(Date.now() / 1000 - t)); return s < 60 ? s + ' 秒前' : s < 3600 ? Math.floor(s / 60) + ' 分钟前' : hm(t); };
+
+  const SHA_K = new Int32Array([
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]);
+  const SHA_IV = new Int32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+  const SW = new Int32Array(64);
+  function compress(H, X, o) {
+    const w = SW;
+    for (let i = 0; i < 16; i++) w[i] = X[o + i];
+    for (let i = 16; i < 64; i++) {
+      const a = w[i - 15], b = w[i - 2];
+      w[i] = (((a >>> 7 | a << 25) ^ (a >>> 18 | a << 14) ^ (a >>> 3)) + w[i - 7] +
+              ((b >>> 17 | b << 15) ^ (b >>> 19 | b << 13) ^ (b >>> 10)) + w[i - 16]) | 0;
+    }
+    let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + ((e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7)) + ((e & f) ^ (~e & g)) + SHA_K[i] + w[i]) | 0;
+      const t2 = (((a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+    H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  function be32(b) {
+    const w = new Int32Array(b.length >> 2);
+    for (let i = 0; i < w.length; i++) w[i] = b[4 * i] << 24 | b[4 * i + 1] << 16 | b[4 * i + 2] << 8 | b[4 * i + 3];
+    return w;
+  }
+  function unbe32(w) {
+    const b = new Uint8Array(w.length * 4);
+    for (let i = 0; i < w.length; i++) { b[4 * i] = w[i] >>> 24; b[4 * i + 1] = w[i] >>> 16; b[4 * i + 2] = w[i] >>> 8; b[4 * i + 3] = w[i]; }
+    return b;
+  }
+  function concat(a, b) { const r = new Uint8Array(a.length + b.length); r.set(a); r.set(b, a.length); return r; }
+  function sha256(m) {
+    const n = m.length, nw = (((n + 8) >> 6) + 1) << 4;
+    const w = new Int32Array(nw);
+    for (let i = 0; i < n; i++) w[i >> 2] |= m[i] << (24 - ((i & 3) << 3));
+    w[n >> 2] |= 0x80 << (24 - ((n & 3) << 3));
+    w[nw - 1] = n * 8;
+    w[nw - 2] = Math.floor(n / 0x20000000);
+    const H = SHA_IV.slice();
+    for (let o = 0; o < nw; o += 16) compress(H, w, o);
+    return unbe32(H);
+  }
+  function hmac(key, msg) {
+    if (key.length > 64) key = sha256(key);
+    const ip = new Uint8Array(64 + msg.length), op = new Uint8Array(96);
+    for (let i = 0; i < 64; i++) { const k = i < key.length ? key[i] : 0; ip[i] = k ^ 0x36; op[i] = k ^ 0x5c; }
+    ip.set(msg, 64);
+    op.set(sha256(ip), 64);
+    return sha256(op);
+  }
+  function pbkdf2JS(pw, salt, iter) {
+    if (pw.length > 64) pw = sha256(pw);
+    const ip = new Uint8Array(64), op = new Uint8Array(64);
+    for (let i = 0; i < 64; i++) { const k = i < pw.length ? pw[i] : 0; ip[i] = k ^ 0x36; op[i] = k ^ 0x5c; }
+    const Hi = SHA_IV.slice(), Ho = SHA_IV.slice();
+    compress(Hi, be32(ip), 0);
+    compress(Ho, be32(op), 0);
+    const T = be32(hmac(pw, concat(salt, new Uint8Array([0, 0, 0, 1]))));
+    const blk = new Int32Array(16), H = new Int32Array(8);
+    blk.set(T, 0); blk[8] = 0x80000000 | 0; blk[15] = 96 * 8;
+    for (let it = 1; it < iter; it++) {
+      H.set(Hi); compress(H, blk, 0); blk.set(H, 0);
+      H.set(Ho); compress(H, blk, 0); blk.set(H, 0);
+      for (let i = 0; i < 8; i++) T[i] ^= H[i];
+    }
+    return unbe32(T);
+  }
+  const utf8 = s => new TextEncoder().encode(s);
+  const hex = b => Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+  const unhex = h => /^[0-9a-f]{64}$/.test(h) ? new Uint8Array(h.match(/../g).map(x => parseInt(x, 16))) : null;
+  async function deriveKey(pw) {
+    const p = utf8(pw), s = utf8(CFG.salt);
+    const subtle = window.isSecureContext !== false && window.crypto && window.crypto.subtle;
+    if (subtle) {
+      try {
+        const k = await subtle.importKey('raw', p, { name: 'PBKDF2' }, false, ['deriveBits']);
+        return new Uint8Array(await subtle.deriveBits({ name: 'PBKDF2', salt: s, iterations: CFG.iter, hash: 'SHA-256' }, k, 256));
+      } catch (e) { }
+    }
+    await sleep(30);
+    return pbkdf2JS(p, s, CFG.iter);
+  }
+
+  let K = null;
+  const stores = () => { const r = []; try { r.push(sessionStorage, localStorage); } catch (e) {} return r; };
+  function loadKey() { for (const st of stores()) { try { const k = unhex(st.getItem(KEY_NAME) || ''); if (k) return k; } catch (e) {} } return null; }
+  function saveKey(k, remember) { try { (remember ? localStorage : sessionStorage).setItem(KEY_NAME, hex(k)); } catch (e) {} }
+  function forgetKey() { for (const st of stores()) { try { st.removeItem(KEY_NAME); } catch (e) {} } }
+
+  let good = null;
+  function failure(status, d) {
+    const auth = status === 403 && d && d.err === 'auth';
+    const e = new Error(
+      auth ? '密码不对' :
+      status === 401 && d && d.err === 'clock' ? '这台设备的时间和服务器差了约 ' + Math.max(1, Math.round(Math.abs(Date.now() / 1000 - d.now) / 60)) + ' 分钟，校准系统时间后再试' :
+      status === 429 ? '操作太频繁，服务器让等一会儿，稍后自动再试' :
+      d && d.msg ? d.msg :
+      status === 403 || status === 404 || status === 405 ? '服务器连上了，但上面还是旧版本（没有新后台），需要重新部署' :
+      '服务器出错（HTTP ' + status + '）');
+    e.auth = auth;
+    return e;
+  }
+  async function call(op, args) {
+    const b = JSON.stringify(Object.assign({ op, t: Date.now(), r: Math.random().toString(36).slice(2, 10) }, args || {}));
+    const body = JSON.stringify({ b, m: hex(hmac(K, utf8(b))) });
+    const order = good !== null ? [good].concat(CFG.api.filter(a => a !== good)) : CFG.api.slice();
+    for (const base of order) {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6000);
+      let r;
+      try { r = await fetch(base + '/api/admin', { method: 'POST', body, cache: 'no-store', signal: ctl.signal }); }
+      catch (e) { continue; }
+      finally { clearTimeout(to); }
+      good = base;
+      let d = null;
+      try { d = await r.json(); } catch (e) { }
+      if (r.ok && d && d.ok) return d;
+      throw failure(r.status, d);
+    }
+    throw new Error('连不上服务器（' + order.length + ' 个地址都试过了）。换个网络（比如手机热点）再试');
+  }
+
+  function showLogin(msg) {
+    $('#app').hidden = true; $('#login').hidden = false;
+    $('#lg-err').textContent = msg || '';
+    $('#pw').focus();
+  }
+  function logout(msg) { K = null; data = null; logRows = []; logOld = false; forgetKey(); showLogin(msg); }
+  $('#lg').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pw = $('#pw').value;
+    if (!pw) return;
+    $('#lg-go').disabled = true; $('#lg-err').textContent = '校验中…'; $('#lg-err').classList.add('wait');
+    try {
+      K = await deriveKey(pw);
+      await load();
+      saveKey(K, $('#remember').checked);
+      $('#pw').value = ''; $('#lg-err').textContent = '';
+      $('#login').hidden = true; $('#app').hidden = false;
+      render();
+    } catch (ex) { K = null; $('#lg-err').textContent = ex.message; }
+    finally { $('#lg-go').disabled = false; $('#lg-err').classList.remove('wait'); }
+  });
+  $('#logout').addEventListener('click', () => logout(''));
+
+  let data = null, okAt = 0, err = '', busy = false, again = false;
+  async function load() {
+    const la = logArgs();
+    data = await call('data', la); okAt = Date.now() / 1000; err = '';
+    takeLog(data, la);
+  }
+  async function refresh() {
+    if (!K) return;
+    if (busy) { again = true; return; }
+    busy = true; $('#refresh').disabled = true;
+    let authFail = false;
+    try { await load(); }
+    catch (e) { authFail = e.auth; err = e.message; }
+    finally { busy = false; $('#refresh').disabled = false; }
+    if (authFail) return logout('密码不对或已经换了，请重新输入');
+    render();
+    if (again) { again = false; refresh(); }
+  }
+
+  function renderStatus() {
+    const el = $('#status');
+    if (err) el.innerHTML = '<i class="dot err"></i><span>' + esc(data ? '刷新失败，下面是 ' + hms(okAt) + ' 的数据' : '没拿到数据') + '</span>';
+    else if (data) el.innerHTML = '<i class="dot ok"></i><span>已连接 · 更新于 ' + hms(okAt) + '（' + ago(okAt) + '）· 每 ' + REFRESH +
+      ' 秒自动刷新' + (good ? ' <span class="muted">· ' + esc(good) + '</span>' : '') + '</span>';
+    const m = $('#msg');
+    m.hidden = !err; m.textContent = err;
+  }
+
+  const isSpare = t => t.name.indexOf('备用') === 0;
+  const count = t => Object.keys(t.solved).length;
+  const unused = t => isSpare(t) && !t.seen && !count(t);
+  const lastAt = t => Math.max.apply(null, [0].concat(Object.keys(t.solved).map(k => t.solved[k])));
+  const statPanels = () => data.panels.filter(p => p.stat && p.qids.length);
+  const bar = (lb, n, den, tip, val) => '<div class="row" data-tip="' + esc(tip) + '"><span class="lb">' + esc(lb) + '</span>' +
+    '<div class="track">' + (n ? '<div class="fill" style="width:' + (100 * n / den).toFixed(1) + '%"></div>' : '') + '</div>' +
+    '<span class="val">' + esc(val) + '</span></div>';
+  const tile = (lb, v, unit, warn) => '<div class="tile"><div class="lb">' + (warn ? '<span class="ic warn">⚠</span> ' : '') + esc(lb) +
+    '</div><div class="v">' + v + '<small>' + esc(unit) + '</small></div></div>';
+
+  function render() {
+    renderStatus();
+    if (!data) return;
+    $('#body').hidden = false;
+    const S = data.stats, panels = statPanels();
+    const real = data.teams.filter(t => !t.test && !unused(t));
+    const active = S.active, den = Math.max(active, 1);
+    const flagsN = real.reduce((a, t) => a + t.flags, 0);
+    $('#tiles').innerHTML = tile('已出发', active, '/ ' + real.length + ' 队') + tile('已通关', S.finishedCount, '队') +
+      tile('全场已找到', S.solvedTotal, '个点') + tile('可疑记录', flagsN, '条', flagsN > 0);
+    $('#zbars').innerHTML = panels.map(p => {
+      const n = S.panels[p.id] || 0;
+      return bar(p.label, n, den, n + ' 队完成了「' + p.label + '」（已出发 ' + active + ' 队）', n + ' / ' + active);
+    }).join('');
+    $('#qbars').innerHTML = panels.map(p => '<div class="zone"><h3>' + esc(p.label) + '</h3>' + p.qids.map(q => {
+      const n = S.questions[q] || 0;
+      return bar(q, n, den, q + '：' + n + ' 队找到（已出发 ' + active + ' 队）', n);
+    }).join('') + '</div>').join('');
+    renderTeams();
+    renderLog();
+  }
+
+  function renderTeams() {
+    if (!data) return;
+    const panels = statPanels();
+    const byProg = (a, b) => (a.test - b.test) || ((a.fin ? 0 : 1) - (b.fin ? 0 : 1)) || ((a.fin || 0) - (b.fin || 0)) ||
+      (count(b) - count(a)) || (lastAt(a) - lastAt(b)) || a.name.localeCompare(b.name, 'zh-CN');
+    const rank = {};
+    data.teams.filter(t => !t.test && count(t)).sort(byProg).forEach((t, i) => { rank[t.code] = i + 1; });
+    const kw = $('#kw').value.trim().toLowerCase(), all = $('#all').checked;
+    let list = data.teams.filter(t => all || (!t.test && !unused(t)));
+    if (kw) list = list.filter(t => (t.name + ' ' + t.members + ' ' + t.verify).toLowerCase().indexOf(kw) >= 0);
+    list.sort($('#sort').value === 'name' ? (a, b) => (a.test - b.test) || a.name.localeCompare(b.name, 'zh-CN') : byProg);
+    $('#tcount').textContent = '显示 ' + list.length + ' 队；鼠标停在格子上看几点找到的；改进度、改名、删除点「编辑」';
+    $('#teams').innerHTML = list.map(t => {
+      const grid = panels.map(p => '<span>' + p.qids.map(q => {
+        const at = t.solved[q];
+        return '<i class="' + (at ? 'y' : '') + '" data-tip="' + esc(t.name + ' · ' + q + (at ? ' · ' + hms(at) + ' 找到' : ' · 未找到')) + '"></i>';
+      }).join('') + '</span>').join('');
+      return '<tr class="' + (t.test ? 'test' : '') + '"><td class="num">' + (rank[t.code] || '') + '</td>' +
+        '<td><b>' + esc(t.name) + '</b>' + (t.test ? '（测试）' : '') + '<span class="mem">' + esc(t.members) + '</span></td>' +
+        '<td class="code">' + esc(t.verify || '—') + '</td><td><div class="grid">' + grid + '</div></td><td class="num">' + count(t) + '</td>' +
+        '<td>' + (t.fin ? '<span class="ic good">✓</span> ' + hm(t.fin) : '') + '</td>' +
+        '<td data-tip="' + esc(t.seen ? '最后一次上报 ' + hms(t.seen) : '还没联网上报过') + '">' + (t.seen ? ago(t.seen) : '—') + '</td>' +
+        '<td>' + (t.flags ? '<span class="ic warn">⚠</span> ' + t.flags : '') + '</td>' +
+        '<td><button data-edit="' + esc(t.code) + '">编辑</button></td></tr>';
+    }).join('') || '<tr><td colspan="9" class="empty">没有符合条件的队伍</td></tr>';
+  }
+
+  const KIND = { solve: [0, '答对上报'], first: [0, '首次联网'], bad_proof: [1, '证明不对'], unknown_code: [1, '未知队伍码'],
+    slow: [1, '限流'], admin: [0, '后台操作'], admin_fail: [1, '后台密码错'], start: [0, '服务启动'] };
+  const GROUP = { solve: ['solve', 'first'], warn: ['bad_proof', 'unknown_code', 'slow', 'admin_fail'], admin: ['admin', 'admin_fail', 'start'] };
+  const GROUP_NAME = { '': '全部', solve: '答题与联网', warn: '可疑与限流', admin: '后台操作' };
+  let logRows = [], logMore = false, logOld = false;
+  const logArgs = () => ({ g: $('#lk').value, kw: $('#lkw').value.trim().slice(0, 40) });
+  const sameArgs = (a, b) => a.g === b.g && a.kw === b.kw;
+  function takeLog(d, la) {
+    if (!logOld && sameArgs(la, logArgs())) { logRows = d.log || []; logMore = !!d.more; }
+  }
+  function renderLog() {
+    if (!data) return;
+    const c = data.logCounts || {}, sum = ks => ks.reduce((s, k) => s + (c[k] || 0), 0);
+    Array.from($('#lk').options).forEach(o => { o.textContent = GROUP_NAME[o.value] + '（' + sum(o.value ? GROUP[o.value] : Object.keys(c)) + '）'; });
+    const la = logArgs();
+    $('#log').innerHTML = logRows.length
+      ? '<table><thead><tr><th>时间</th><th>类型</th><th>队伍</th><th>内容</th><th>IP</th></tr></thead><tbody>' + logRows.map(x => {
+        const k = KIND[x.kind] || [0, x.kind];
+        return '<tr><td>' + hms(x.at) + '</td><td>' + (k[0] ? '<span class="ic warn">⚠</span> ' : '') + esc(k[1]) + '</td><td>' + esc(x.team) +
+          '</td><td class="wide">' + esc(x.detail) + '</td><td>' + esc(x.ip) + '</td></tr>';
+      }).join('') + '</tbody></table>'
+      : '<div class="empty">' + (la.g || la.kw ? '没有符合条件的记录' : '暂无') + '</div>';
+    $('#lmore').hidden = !logMore;
+    $('#lpause').hidden = $('#lnew').hidden = !logOld;
+  }
+  function logFilter() { logOld = false; refresh(); }
+  let lkwT = 0;
+  $('#lk').addEventListener('change', logFilter);
+  $('#lkw').addEventListener('input', () => { clearTimeout(lkwT); lkwT = setTimeout(logFilter, 400); });
+  $('#lnew').addEventListener('click', logFilter);
+  $('#lmore').addEventListener('click', async () => {
+    const la = logArgs(), last = logRows[logRows.length - 1];
+    if (!last) return;
+    $('#lmore').disabled = true;
+    try {
+      const d = await call('log', Object.assign({ before: last.id }, la));
+      if (sameArgs(la, logArgs()) && logRows[logRows.length - 1] === last) {
+        logRows = logRows.concat(d.log); logMore = !!d.more; logOld = true; renderLog();
+      }
+    } catch (e) {
+      if (e.auth) return logout('密码不对或已经换了，请重新输入');
+      toast(e.message);
+    } finally { $('#lmore').disabled = false; }
+  });
+
+  let editing = null;
+  function openEdit(code) {
+    if (!data) return;
+    const t = code ? data.teams.find(x => x.code === code) : null;
+    if (code && !t) return;
+    editing = t ? { code: t.code, name: t.name, solved: Object.assign({}, t.solved) } : { code: '', name: '', solved: {} };
+    $('#dlg-title').textContent = t ? '编辑「' + t.name + '」' : '新增队伍';
+    $('#f-name').value = t ? t.name : '';
+    $('#f-members').value = t ? t.members : '';
+    $('#f-test').checked = t ? t.test : false;
+    $('#dlg-info').innerHTML = t
+      ? '核验码 <span class="code">' + esc(t.verify || '—') + '</span>' + (t.flags ? ' · <span class="ic warn">⚠</span> 可疑记录 ' + t.flags + ' 条（看下方日志）' : '') +
+        '<br>手机每次联网都会把本机答对的题全部上报一遍：取消勾选只删服务器上的记录，' +
+        '手机上还答着这题的话，它下次联网（约 1 分钟内）会自己补回来；要彻底取消，先在那台手机上「清除进度和账号」。'
+      : '后台新建的队伍<b>在手机上登录不了</b>（登录名单打包在网页里），只用来手动记录进度。现场补报请用备用账号，再在这里把备用账号改成真实队名和成员。';
+    $('#dlg-qs').innerHTML = data.panels.filter(p => p.qids.length).map(p => '<div><b>' + esc(p.label) + '</b>' + p.qids.map(q =>
+      '<label><input type="checkbox" value="' + esc(q) + '"' + (editing.solved[q] ? ' checked' : '') + '> ' + esc(q) + '</label>').join('') + '</div>').join('');
+    $('#dlg-del').hidden = !t;
+    $('#dlg-flags').hidden = !(t && t.flags);
+    $('#dlg-err').textContent = '';
+    $('#dlg').showModal();
+  }
+  function busyDlg(on) { document.querySelectorAll('#dlg button').forEach(b => { b.disabled = on; }); }
+  async function act(op, args, done) {
+    busyDlg(true); $('#dlg-err').textContent = '';
+    try {
+      await call(op, args);
+      $('#dlg').close();
+      toast(done);
+      refresh();
+    } catch (e) {
+      if (e.auth) { $('#dlg').close(); return logout('密码不对或已经换了，请重新输入'); }
+      $('#dlg-err').textContent = e.message;
+    } finally { busyDlg(false); }
+  }
+  $('#dlg-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const boxes = Array.from(document.querySelectorAll('#dlg-qs input'));
+    const add = boxes.filter(c => c.checked && !editing.solved[c.value]).map(c => c.value);
+    const remove = boxes.filter(c => !c.checked && editing.solved[c.value]).map(c => c.value);
+    const args = { code: editing.code, name: $('#f-name').value.trim(), members: $('#f-members').value.trim(), test: $('#f-test').checked, add, remove };
+    if (!args.name) { $('#dlg-err').textContent = '队名不能为空'; return; }
+    if (remove.length && !confirm('取消「' + (editing.name || args.name) + '」' + remove.join('、') + ' 的完成记录？')) return;
+    act('team_save', args, '已保存「' + args.name + '」');
+  });
+  $('#dlg-del').addEventListener('click', () => {
+    if (confirm('删除「' + editing.name + '」？这队在服务器上的进度和可疑记录会一起删掉，不能恢复。'))
+      act('team_del', { code: editing.code }, '已删除「' + editing.name + '」');
+  });
+  $('#dlg-flags').addEventListener('click', () => act('flags_clear', { code: editing.code }, '已清除「' + editing.name + '」的可疑记录'));
+  $('#dlg-cancel').addEventListener('click', () => $('#dlg').close());
+  $('#dlg').addEventListener('click', e => {
+    const a = e.target.getAttribute && e.target.getAttribute('data-all');
+    if (a !== null && a !== undefined) document.querySelectorAll('#dlg-qs input').forEach(c => { c.checked = a === '1'; });
+  });
+  $('#teams').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (b) openEdit(b.getAttribute('data-edit')); });
+  $('#add').addEventListener('click', () => openEdit(''));
+
+  let toastT = 0;
+  function toast(s) { const el = $('#toast'); el.textContent = s; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2200); }
+
+  const tip = $('#tip');
+  function place(e) {
+    const x = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8);
+    tip.style.left = Math.max(8, x) + 'px';
+    tip.style.top = (e.clientY + 18) + 'px';
+  }
+  document.addEventListener('pointerover', e => {
+    const el = e.target.closest && e.target.closest('[data-tip]');
+    if (!el) { tip.style.display = 'none'; return; }
+    tip.textContent = el.getAttribute('data-tip'); tip.style.display = 'block'; place(e);
+  });
+  document.addEventListener('pointermove', e => { if (tip.style.display === 'block') place(e); });
+  document.addEventListener('pointerout', e => { if (!e.relatedTarget) tip.style.display = 'none'; });
+
+  $('#refresh').addEventListener('click', refresh);
+  ['#kw', '#sort', '#all'].forEach(s => $(s).addEventListener(s === '#kw' ? 'input' : 'change', renderTeams));
+  setInterval(() => { if (K && !document.hidden && !$('#app').hidden) refresh(); }, REFRESH * 1000);
+  setInterval(() => { if (data && !$('#app').hidden) renderStatus(); }, 1000);
+
+  K = loadKey();
+  if (K) { $('#app').hidden = false; refresh(); }
+  else showLogin('');
+})();
+</script></body></html>

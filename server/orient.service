@@ -1,0 +1,20 @@
+[Unit]
+Description=Orienteering progress server (stats only)
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/orient
+ExecStart=/usr/bin/python3 /opt/orient/app.py serve
+Restart=always
+RestartSec=2
+User=orient
+MemoryMax=100M
+CPUQuota=60%
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/orient
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

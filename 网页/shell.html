@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#fbf6ec" />
+<title>{{TITLE}}</title>
+<style>{{CSS}}
+</style>
+</head>
+<body>
+<div id="nojs" class="fatal">
+  <h2>{{TITLE}}</h2>
+  <p>你现在看到的是<strong>预览</strong>，网页没有运行起来。</p>
+  <p>请点右上角「…」或「用其他应用打开」，选择<strong>浏览器</strong>（手机自带浏览器、Chrome、Safari 均可）打开本文件。</p>
+</div>
+<noscript><div class="fatal"><p>需要开启 JavaScript 才能使用。</p></div></noscript>
+<header class="app-header">
+  <button id="menu-btn" class="menu-btn" aria-label="打开菜单">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="4" y1="7"  x2="20" y2="7"/>
+      <line x1="4" y1="12" x2="20" y2="12"/>
+      <line x1="4" y1="17" x2="20" y2="17"/>
+    </svg>
+  </button>
+  <h1 id="app-title" class="app-title">{{TITLE}}</h1>
+  <button id="net-btn" class="net-btn" aria-label="队伍与全场进度">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <span class="net-dot"></span>
+  </button>
+</header>
+<div class="input-bar">
+  <input id="global-input" type="text"
+    autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+    placeholder="题号 答案，如 A1 某某某" />
+  <button id="global-submit">提交</button>
+</div>
+<main id="main" class="main"></main>
+<div id="drawer-mask" class="drawer-mask"></div>
+<aside id="drawer" class="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>{{TITLE}}</h2>
+    <p>2026 · 秋 · 清华园</p>
+  </div>
+  <div id="drawer-list" class="drawer-list"></div>
+</aside>
+<div id="sheet-mask" class="drawer-mask"></div>
+<section id="sheet" class="sheet"><div id="sheet-body" class="sheet-body"></div></section>
+<div id="toast" class="toast"></div>
+<script>window.GAME_MANIFEST = {{MANIFEST}};</script>
+<script>
+{{APP}}
+</script>
+</body>
+</html>
